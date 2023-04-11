@@ -104,3 +104,12 @@ async function createChart() {
     await context.sync();
   });
 }
+async function freezeHeader() {
+  await Excel.run(async (context) => {
+
+    const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+    currentWorksheet.freezePanes.freezeRows(1);
+
+    await context.sync();
+  });
+}
