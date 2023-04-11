@@ -15,6 +15,7 @@ Office.onReady((info) => {
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
     document.getElementById("freeze-header").onclick = () => tryCatch(freezeHeader);
+    document.getElementById("open-dialog").onclick = openDialog;
   }
 });
 
@@ -112,4 +113,23 @@ async function freezeHeader() {
 
     await context.sync();
   });
+}
+
+let dialog = null;
+
+function openDialog() {
+  Office.context.ui.displayDialogAsync(
+      'https://localhost:3000/popup.html',
+      {height: 45, width: 55},
+
+      function (result) {
+        dialog = result.value;
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
+      }
+  );
+}
+
+function processMessage(arg) {
+  document.getElementById("user-name").innerHTML = arg.message;
+  dialog.close();
 }
