@@ -3,6 +3,8 @@
  * See LICENSE in the project root for license information.
  */
 
+import { base64Image } from "../../base64Image";
+
 /* global document, Office, Word */
 
 Office.onReady((info) => {
@@ -17,6 +19,9 @@ Office.onReady((info) => {
     document.getElementById("insert-text-into-range").onclick = () => tryCatch(insertTextIntoRange);
     document.getElementById("insert-text-outside-range").onclick = () => tryCatch(insertTextBeforeRange);
     document.getElementById("replace-text").onclick = () => tryCatch(replaceText);
+    document.getElementById("insert-image").onclick = () => tryCatch(insertImage);
+    document.getElementById("insert-html").onclick = () => tryCatch(insertHTML);
+    document.getElementById("insert-table").onclick = () => tryCatch(insertTable);
   }
 });
 
@@ -108,6 +113,38 @@ async function replaceText() {
     const doc = context.document;
     const originalRange = doc.getSelection();
     originalRange.insertText("many", Word.InsertLocation.replace);
+
+    await context.sync();
+  });
+}
+async function insertImage() {
+  await Word.run(async (context) => {
+
+    context.document.body.insertInlinePictureFromBase64(base64Image, Word.InsertLocation.end);
+
+    await context.sync();
+  });
+}
+async function insertHTML() {
+  await Word.run(async (context) => {
+
+    const blankParagraph = context.document.body.paragraphs.getLast().insertParagraph("", Word.InsertLocation.after);
+    blankParagraph.insertHtml('<p style="font-family: verdana;">Inserted HTML.</p><p>Another paragraph</p>', Word.InsertLocation.end);
+
+    await context.sync();
+  });
+}
+async function insertTable() {
+  await Word.run(async (context) => {
+
+    const secondParagraph = context.document.body.paragraphs.getFirst().getNext();
+
+    const tableData = [
+      ["Name", "ID", "Birth City"],
+      ["Bob", "434", "Chicago"],
+      ["Sue", "719", "Havana"],
+    ];
+    secondParagraph.insertTable(3, 3, Word.InsertLocation.after, tableData);
 
     await context.sync();
   });
