@@ -11,6 +11,9 @@ Office.onReady((info) => {
     document.getElementById("app-body").style.display = "flex";
     // Assign event handlers and other initialization logic.
     document.getElementById("insert-paragraph").onclick = () => tryCatch(insertParagraph);
+    document.getElementById("apply-style").onclick = () => tryCatch(applyStyle);
+    document.getElementById("apply-custom-style").onclick = () => tryCatch(applyCustomStyle);
+    document.getElementById("change-font").onclick = () => tryCatch(changeFont);
   }
 });
 
@@ -33,4 +36,35 @@ async function tryCatch(callback) {
     // Note: In a production add-in, you'd want to notify the user through your add-in's UI.
     console.error(error);
   }
+}
+async function applyStyle() {
+  await Word.run(async (context) => {
+
+    const firstParagraph = context.document.body.paragraphs.getFirst();
+    firstParagraph.styleBuiltIn = Word.Style.intenseReference;
+
+    await context.sync();
+  });
+}
+async function applyCustomStyle() {
+  await Word.run(async (context) => {
+
+    const lastParagraph = context.document.body.paragraphs.getLast();
+    lastParagraph.style = "MyCustomStyle";
+
+    await context.sync();
+  });
+}
+async function changeFont() {
+  await Word.run(async (context) => {
+
+    const secondParagraph = context.document.body.paragraphs.getFirst().getNext();
+    secondParagraph.font.set({
+      name: "Courier New",
+      bold: true,
+      size: 18
+    });
+
+    await context.sync();
+  });
 }
